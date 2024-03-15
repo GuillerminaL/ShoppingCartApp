@@ -5,9 +5,11 @@ The app allows a user to have multiple carts and reuse them once the cart order 
 
 Since each purchase generates a register, it also allows to keep track of them, making easy to keep track of remaining stock of products after each purchase and elaborate informs such as regular purchases in general or for particular users, etc. 
 
+## Demo
+
+![shoppingcart_api_demo.gif](shoppingcart_api_demo.gif)
 
 # ERD
-
 
 ![ERD_shoppingcart_app.svg](ERD_shoppingcart_app.svg)
 
@@ -462,7 +464,16 @@ has been created along with each one of its product orders.
 
 [Find it here](shoppingcart_api.postman_collection.json)
 
+# Technical description
 
-## Demo
+Hexagonal Architecture
+Apache Maven 4.0.0
+Spring Boot 2.6.2
+Java 11 Amazon Coretto
+Liquibase 4.8.0
+Mapstruct 1.5.3.Final
+Lombok 1.18.4
+JUnit 5.7.0
+PostgreSQL -Trade off: some features are improved with db processing as the db has been set by requirements- 
 
-![shoppingcart_api_demo.gif](shoppingcart_api_demo.gif)
+
