@@ -1,0 +1,156 @@
+{
+	"info": {
+		"_postman_id": "50d14e17-c4c2-47c3-bded-09384083ce24",
+		"name": "shoppingcart_api",
+		"description": "Api Cart Entity Relationship Diagram (ERD)\n\n<img src=\"https://content.pstmn.io/827850dd-fd6c-4f77-9365-1f3beb400ca9/TGFtYW5zeXNfQkVCQ19UUEUtMjAyMy0xMC0xNl8xOC01Ni5zdmc=\">",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18030091"
+	},
+	"item": [
+		{
+			"name": "cart",
+			"item": [
+				{
+					"name": "{userId}",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"productId\": 1,\r\n  \"quantity\": 20\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/cart/userid",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"cart",
+								"userid"
+							]
+						},
+						"description": "#### Requirements\n\n- Path variable _{userId}_:\n    - Existing and active user\n    - String, not null, not blank, not empty\n- _productId_: Integer, not null\n- _quantity_: Integer, not null, greater than 0\n    \n\n### Returns\n\n**200 OK**\n\nIndicates that a new cart had been created, related to the specified user, and that the specified product order has been added to the new cart. Returns the new cart id.\n\n```\n{\n    \"newCartId\": 18\n}\n\n ```\n\n**400 BAD REQUEST**\n\n- **UserRequiredException**:  \n    Caused by: _userId_ is null, empty or blank\n    \n    ```\n                  {\n                      \"type\": \"user_id_required\",   \n                      \"message\": \"User id is required in order to create a new cart or product order\"\n                    }\n    \n     ```\n    \n\n- **ProductRequiredException**: ﻿  \n    Caused by: _productId_ is null\n    \n    ```\n                  {\n                      \"type\": \"product_id_required_error\",\n                      \"message\": \"Product specification is required in order to create a new cart or product order\"\n                  }\n    \n     ```\n    \n\n- **MinimunQuantityProductOrderException**:  \n    Caused by: quantity is null or less than 1\n    \n    ```\n                    {\n                       \"type\": \"min_quantity_order_error\",\n                        \"message\": \"Minimun quantity of 1 product is required in order to create a new cart\"\n                    }\n    \n     ```\n    \n\n**409 CONFLICT**\n\n- **StockAvailabilityException**  \n    Caused by: _quantity_ is greater than available product stock\n    \n    ```\n                   {\n                       \"type\": \"product_stock_not_available\",\n                            \"message\": \"The required quantity: 2 for product id: 1 is over the available stock: 0\"\n                    }\n    \n     ```\n    \n\n**404 NOT FOUND**\n\n- **UserNotFoundException**:  \n    Caused by: _userId_ does not exist or is inactive\n    \n    ```\n                   {\n                        \"type\": \"user_not_found\",\n                        \"message\": \"There's no user with username: string\"\n                    }\n    \n     ```\n    \n\n- **ProductNotFoundException**:  \n    Caused by: _productId_ does not exist\n    \n    ```\n                   {\n                       \"type\": \"product_not_found\",\n                       \"message\": \"There´s no product id: 0\"\n                    }\n    \n     ```"
+					},
+					"response": []
+				},
+				{
+					"name": "{userId}/{cartId}",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"productId\": 13,\r\n  \"quantity\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/api/cart/userid/13",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"cart",
+								"userid",
+								"13"
+							]
+						},
+						"description": "## POST Cart Product orders \n\nAllows to modify the product´s list contained in an existing and not processed user´s cart:\n- Adds the product to the cart, with the specified quantity, if the product is not contained in the cart´s list\n  - Minimun quantity of product order is 1\n- Updates the quantity of an existing product order to the specified quantity, if the product already exists in the cart´s list\n  - If the specified quantity equals to 0, the product is removed from the cart´s list\n\n\nPOST [/api/cart/{userId}/{cartId}](http://localhost:8080/api/cart)\n\n\n\n### Body JSON\n\n#### Example\n\n```\n{\n    \"productId\": 10,\n    \"quantity\": 2\n}\n\n ```\n\n#### Requirements\n\n- Path variable _{userId}_:\n    - Existing and active user´s id\n    - String, not null, not blank, not empty\n- Path variable _{cartId}_:\n    - Existing and not purchased cart´s id\n    - Integer, not null, not blank, not empty\n- _productId_: Integer, not null\n- _quantity_: Integer, not null,\n    - greater than 0 to add a product or update an existing one´s quantity\n    - equal to 0 will remove a product from cart\n\n### Returns\n\n**200 OK**\n\nIndicates that a product order has been successfully added to the product´s cart list\n\n```\n{\n    The new product order product id: 10, quantity: 1 has been added!\n}\n\n ```\n\nIndicates that an existing product order has been successfully updated\n\n```\n{\n    The quantity of product id: 10 has been updated to 3!\n}\n\n ```\n\nIndicates that an existing product order has been successfully updated to 0, hence removed from the cart list\n\n```\n{\n    The product id: 10 order has been deleted\n}\n\n ```\n\n**400 BAD REQUEST**\n\n- **UserRequiredException**:\n    Caused by: _userId_ is null, empty or blank\n    \n    ```\n    {\n        \"type\": \"user_id_required\",   \n        \"message\": \"User id is required in order to create a new cart or product order\"\n      }\n    \n     ```\n    \n\n- **ProductRequiredException**: ﻿\n    Caused by: _productId_ is null\n    \n    ```\n    {\n        \"type\": \"product_id_required_error\",\n        \"message\": \"Product specification is required in order to create a new cart or product order\"\n    }\n    \n     ```\n    \n\n- **MinimunQuantityProductOrderException**:\n    Caused by: quantity is null or less than 1\n    \n    ```\n      {\n         \"type\": \"min_quantity_order_error\",\n          \"message\": \"Minimun quantity of 1 product is required in order to create a new cart\"\n      }\n    \n     ```\n    \n\n**404 NOT FOUND**\n\n- **UnavailableCartException**:\n    Caused by: _cartId_ exists but has already been purchased\n    \n    ```\n     {\n          \"type\": \"unavailable_cart\",\n          \"message\": \"Can not modify the cart id: 1, user id: flauge anymore since it has already been purchased\"\n      }\n    \n     ```\n    \n\n**409 CONFLICT**\n\n- **StockAvailabilityException**\n    Caused by: _quantity_ is greater than available product stock\n    \n    ```\n     {\n         \"type\": \"product_stock_not_available\",\n          \"message\": \"The required quantity: 2 for product id: 1 is over the available stock: 0\"\n     }\n    \n     ```\n    \n\n**404 NOT FOUND**\n\n- **UserNotFoundException**:Caused by: _userId_ does not exist or is inactive\n    \n    ```\n     {\n          \"type\": \"user_not_found\",\n          \"message\": \"There's no user with username: string\"\n      }\n    \n     ```\n    \n- **CartNotFoundException**:\n    Caused by: _cartId_ of _userId_ does not exist\n    \n    ```\n     {\n         \"type\": \"cart_not_found\",\n         \"message\": \"There´s no cart with cart id: 20 and user id: flauge\"\n      }\n    \n     ```\n    \n\n- **ProductNotFoundException**:\n    Caused by: _productId_ does not exist\n    \n    ```\n     {\n         \"type\": \"product_not_found\",\n         \"message\": \"There´s no product id: 0\"\n      }\n    \n     ```"
+					},
+					"response": []
+				},
+				{
+					"name": "{userId}/{cartId}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/cart/userid/8",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"cart",
+								"userid",
+								"8"
+							]
+						},
+						"description": "## GET User Cart\n\nReturns the detail of an existing cart identified by its id and the user id,  \nincluding the products and quantity of orders contained in it.\n\nGET [/api/cart/{userId}/{cartId}](http://localhost:8080/api/cart)\n\n#### Requirements\n\n- Path variable _{userId}_:\n    - String, not null, not blank, not empty\n    - Active/inactive user\n- Path variable _{cartId}_:\n    - Integer, not null\n    - Existing processed/unprocessed\n\n### Returns\n\n**200 OK**\n\nIndicates that the cart has been successfully found.  \nMay contain an empty list if it has no products orders\n\n```\n{\n    \"id\": 2,\n    \"userId\": \"userid\",\n    \"processed\": false,\n    \"products\": [\n        {\n            \"productId\": 4,\n            \"quantity\": 1\n        },\n        {\n            \"productId\": 10,\n            \"quantity\": 2\n        }\n    ]\n}\n\n ```\n\n**404 NOT FOUND**\n\n- { \"type\": \"cart_not_found\", \"message\": \"There´s no cart with cart id: 20 and user id: userid\" }"
+					},
+					"response": []
+				},
+				{
+					"name": "{userId}/{cartId}/amount",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/cart/userid/8/amount",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"cart",
+								"userid",
+								"8",
+								"amount"
+							]
+						},
+						"description": "## GET Cart Amount\n\nReturns the total amount of an existing cart identified by its id and the user id, meaning by _total amount_ the addition of each product order contained in it\n\nGET [/api/cart/amount/{userId}/{cartId}](http://localhost:8080/api/cart)\n\n#### Requirements\n\n- Path variable _{userId}_:\n    - String, not null, not blank, not empty\n    - Existing active user id\n- Path variable _{cartId}_:\n    - Integer, not null\n    - Existing unprocessed cart id\n\n### Returns\n\n**200 OK**\n\nIndicates that the total amount for the cart has been successfully obtained.  \nDetail shows \"0.00\" when the cart has no products orders\n\n```\n{\n    \"cartId\": 2,\n    \"userId\": \"flauge\",\n    \"totalAmount\": 319.97\n}\n\n ```\n\n**404 NOT FOUND**\n\n- **UserNotFoundException**:Caused by: _userId_ does not exist or is inactive\n    \n    ```\n       {\n            \"type\": \"user_not_found\",\n            \"message\": \"There's no user with username: string\"\n        }\n    \n     ```\n    \n- **CartNotFoundException**:Caused by: _cartId_ of _userId_ does not exist\n    \n    ```\n       {\n           \"type\": \"cart_not_found\",\n           \"message\": \"There´s no cart with cart id: 20 and user id: flauge\"\n        }\n    \n     ```\n    \n- **UnavailableCartException**:  \n    Caused by: _cartId_ exists but has already been purchased\n    \n    ```\n       {\n            \"type\": \"unavailable_cart\",\n            \"message\": \"Can not modify the cart id: 1, user id: flauge anymore since it has already been purchased\"\n        }\n    \n     ```"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "purchase",
+			"item": [
+				{
+					"name": "confirm/cart/{userId}/{cartId}",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/purchase/confirm/cart/userid/8",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"purchase",
+								"confirm",
+								"cart",
+								"userid",
+								"8"
+							]
+						},
+						"description": "## POST Purchase\n\nAllows the finalize the purchase of an existing and available cart, from an exisiting and active user,  \nsetting the cart state as processed, updating the products stock and  \ncreating a new register of the purchase and each of its product orders.\n\nPOST [/api/purchase/confirm/cart/{userId}/{cartId}](http://localhost:8080/api/purchase)\n\n#### Requirements\n\n- Path variable _{userId}_:\n    - Existing and active user\n    - String, not null, not blank, not empty\n- Path variable _{cartId}_:\n    - Integer, not null\n    - Existing unprocessed cart id\n\n### Returns\n\n**200 OK**\n\nIndicates that a cart has been processed and a new purchase  \nhas been created along with each one of its product orders.\n\n```\n{\n    \"purchaseId\": 16,\n    \"cartId\": 7,\n    \"userId\": \"flauge\",\n    \"purchaseDate\": \"2023-10-16T17:25:32.351Z\",\n    \"purchaseItems\": [\n        {\n            \"id\": 15,\n            \"prodId\": 11,\n            \"prodDescription\": \"The Cheesecake Factory White Chocolate Raspberry Truffle Cheesecake - 10\",\n            \"prodPrice\": 99.99,\n            \"quantity\": 3,\n            \"amount\": 299.96\n        }\n    ],\n    \"totalAmount\": 299.96\n}\n\n ```\n\n**404 NOT FOUND**\n\n- **UserNotFoundException**:Caused by: _userId_ does not exist or is inactive\n    \n    ```\n     {\n          \"type\": \"user_not_found\",\n          \"message\": \"There's no user with username: string\"\n      }\n    \n     ```\n    \n- **CartNotFoundException**:\n    Caused by: _cartId_ of _userId_ does not exist\n    \n    ```\n     {\n         \"type\": \"cart_not_found\",\n         \"message\": \"There´s no cart with cart id: 20 and user id: flauge\"\n      }\n    \n     ```\n    \n\n**401 UNAUTHORIZED**\n\n- **UnavailableCartException**:\n    Caused by: _cartId_ exists but has already been purchased\n    \n    ```\n     {\n          \"type\": \"unavailable_cart\",\n          \"message\": \"Can not access cart id: 1, user id: flauge since it state is purchased\"\n      }\n    \n     ```\n    \n\n**400 BAD REQUEST**\n\n- **EmptyCartException**:\n    Caused by: the specified cart has no product orders\n    \n    ```\n    {\n        \"type\": \"empty_cart\",   \n        \"message\": \"Cart id: 1, user id: flauge is empty\"\"\n      }\n    \n     ```\n    \n\n**409 CONFLICT**\n\n- **UnavailableProductsException**\n    Caused by: _quantity_ is greater than available product stock or products are not available to purchase anymore\n    \n    ```\n     {\n         \"type\": \"available_products\",\n          \"message\": \"The following product ids are no longer available: [8,2]\"\n     }\n    \n     ```"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
