@@ -1,6 +1,6 @@
 ### Shopping Cart Application 
 
-#Description
+# Description
 The app allows a user to have multiple carts and reuse them once the cart order has been processed and purchased.
 
 Since each purchase generates a register, it also allows to keep track of them, making easy to keep track of remaining stock of products after each purchase and elaborate informs such as regular purchases in general or for particular users, etc. 
