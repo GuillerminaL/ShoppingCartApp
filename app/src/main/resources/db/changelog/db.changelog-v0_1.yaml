@@ -1,0 +1,222 @@
+databaseChangeLog:
+  - logicalFilePath: db.changelog-v0_1
+
+  - changeSet:
+      id: 0.0.1-1
+      author: other (generated)
+      changes:
+        - createTable:
+            tableName: day_week
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PK_day_week
+                  name: id
+                  type: SMALLINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: description
+                  type: VARCHAR(9)
+
+  - changeSet:
+      id: 0.0.1-2
+      author: other (generated)
+      changes:
+        - createTable:
+            tableName: date_type
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PK_date_type
+                  name: date
+                  type: date
+              - column:
+                  constraints:
+                    nullable: false
+                  name: day
+                  type: VARCHAR(2)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: day_week_id
+                  type: SMALLINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: month
+                  type: VARCHAR(2)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: year
+                  type: SMALLINT
+
+  - changeSet:
+      id: 0.0.1-3
+      comment: Create table rest_client_measure
+      author: other
+      changes:
+        - createTable:
+            tableName: rest_client_measure
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: PK_rest_client_measure
+                  name: id
+                  type: bigint
+              - column:
+                  constraints:
+                    nullable: false
+                  name: uri
+                  type: varchar(1024)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: host
+                  type: varchar(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: path
+                  type: varchar(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: method
+                  type: varchar(8)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: response_code
+                  type: smallint
+              - column:
+                  constraints:
+                    nullable: false
+                  name: response_time_in_millis
+                  type: bigint
+              - column:
+                  constraints:
+                    nullable: false
+                  name: request_date
+                  type: datetime
+                  defaultValueDate: CURRENT_DATE
+
+  - changeSet:
+      id: 0.0.1-4
+      comment: Carga de datos day_week
+      author: other
+      context: "!schema-only"
+      changes:
+        - sql:
+            sql: |-
+              INSERT INTO day_week VALUES (0, 'Domingo'); 
+              INSERT INTO day_week VALUES (1, 'Lunes');
+              INSERT INTO day_week VALUES (2, 'Martes');
+              INSERT INTO day_week VALUES (3, 'Miércoles');
+              INSERT INTO day_week VALUES (4, 'Jueves');  
+              INSERT INTO day_week VALUES (5, 'Viernes');
+              INSERT INTO day_week VALUES (6, 'Sábado'); 
+
+  - changeSet:
+      id: 0.0.1-5
+      author: other
+      changes:
+        - createProcedure:
+            dbms: postgresql
+            encoding: UTF-8
+            procedureBody: |-
+              DROP PROCEDURE IF EXISTS fill_date_dimension;
+              CREATE PROCEDURE fill_date_dimension(IN startdate DATE,IN stopdate DATE)
+              LANGUAGE plpgsql
+              AS $$
+              DECLARE
+                  currentdate DATE;
+              BEGIN
+                  currentdate := startdate;
+                  WHILE currentdate <= stopdate LOOP
+                      BEGIN
+                          INSERT INTO date_type (date, day, month, year, day_week_id) VALUES (
+                              currentdate,
+                              EXTRACT(DAY FROM currentdate),
+                              EXTRACT(MONTH FROM currentdate),
+                              EXTRACT(YEAR FROM currentdate),
+                              EXTRACT(DOW FROM currentdate)
+                              );
+                      EXCEPTION WHEN OTHERS THEN
+                          RAISE NOTICE '% % %', SQLERRM, SQLSTATE, currentdate;
+                      END;
+                      currentdate := currentdate + '1 day'::INTERVAL ;
+                  END LOOP;
+              END; $$;
+            procedureName: fill_date_dimension
+            relativeToChangelogFile: true
+
+  - changeSet:
+      id: 0.0.1-6
+      author: etrapani
+      changes:
+        - sql:
+            dbms: postgresql
+            sql: |-
+              CALL fill_date_dimension('01-01-2021','01-01-2050');
+
+  - changeSet:
+      id: 0.0.1-7
+      comment: Create table shedlock
+      author: other
+      changes:
+        - createTable:
+            tableName: shedlock
+            columns:
+              - column:
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: PK_shedlock
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  name: lock_until
+                  type: TIMESTAMP
+              - column:
+                  name: locked_at
+                  type: TIMESTAMP
+              - column:
+                  name: locked_by
+                  type: VARCHAR(255)
+
+  - changeSet:
+      id: 0.0.1-8
+      comment: Create table sync_error
+      author: other
+      changes:
+        - createTable:
+            tableName: sync_error
+            columns:
+              - column:
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: PK_sync_error
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: entity
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: performed_date
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: log
+                  type: VARCHAR(255)

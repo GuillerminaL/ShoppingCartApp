@@ -1,0 +1,225 @@
+databaseChangeLog:
+  - logicalFilePath: db.changelog-v0_2
+
+  - changeSet:
+      id: 0.0.2-1
+      comment: Create table cart_user
+      author: flauge
+      changes:
+        - createTable:
+            tableName: cart_user
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PK_user
+                  name: username
+                  type: VARCHAR(16)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: active
+                  type: boolean
+                  defaultValueBoolean: ${boolean.true}
+
+  - changeSet:
+      id: 0.0.2-2
+      comment: Create table product
+      author: flauge
+      changes:
+        - createTable:
+            tableName: product
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PK_product
+                  name: id
+                  type: SERIAL
+              - column:
+                  constraints:
+                    nullable: false
+                  name: description
+                  type: VARCHAR(80)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: stock
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: price
+                  type: DOUBLE
+
+  - changeSet:
+      id: 0.0.2-3
+      comment: Create table cart
+      author: flauge
+      changes:
+        - createTable:
+            tableName: cart
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                  name: id
+                  type: SERIAL
+              - column:
+                  constraints:
+                    nullable: false
+                  name: processed
+                  type: boolean
+                  defaultValueBoolean: ${boolean.false}
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: VARCHAR
+
+  - changeSet:
+     id:  0.0.2-4
+     comment: Add foreign key(username) constraint to cart table
+     author:  flauge
+     changes:
+       -  addForeignKeyConstraint:
+            baseColumnNames:  user_id
+            baseTableName:  cart
+            baseTableSchemaName:  public
+            constraintName:  fk_cart_user
+            onDelete:  RESTRICT
+            onUpdate:  RESTRICT
+            referencedColumnNames:  username
+            referencedTableName:  cart_user
+            referencedTableSchemaName:  public
+
+  - changeSet:
+      id:  0.0.2-5
+      comment: Add primary key(id, user_id) constraint to cart table
+      author:  flauge
+      changes:
+        -  addPrimaryKey:
+             columnNames: id, user_id
+             constraintName: pk_cart
+             tableName: cart
+
+  - changeSet:
+      id: 0.0.2-6
+      comment: Create table cart_product
+      author: flauge
+      changes:
+        - createTable:
+            tableName: cart_product
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: cart_id
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: VARCHAR
+              - column:
+                  constraints:
+                    nullable: false
+                  name: product_id
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: quantity
+                  type: INT
+                  defaultValueNumeric: "1"
+
+  - changeSet:
+      id:  0.0.2-7
+      comment: Add foreign key(cart_id, user_id) constraint to cart_product table
+      author:  flauge
+      changes:
+        -  addForeignKeyConstraint:
+             baseColumnNames:  cart_id, user_id
+             baseTableName:  cart_product
+             baseTableSchemaName:  public
+             constraintName:  fk_cart_product_cart
+             onDelete:  RESTRICT
+             onUpdate:  RESTRICT
+             referencedColumnNames:  id, user_id
+             referencedTableName:  cart
+             referencedTableSchemaName:  public
+
+  - changeSet:
+      id:  0.0.2-8
+      comment: Add foreign key(product_id) constraint to cart_product table
+      author:  flauge
+      changes:
+        -  addForeignKeyConstraint:
+             baseColumnNames:  product_id
+             baseTableName:  cart_product
+             baseTableSchemaName:  public
+             constraintName:  fk_cart_product_product
+             onDelete:  RESTRICT
+             onUpdate:  RESTRICT
+             referencedColumnNames:  id
+             referencedTableName:  product
+             referencedTableSchemaName:  public
+
+  - changeSet:
+      id:  0.0.2-9
+      comment: Add primary key(cart_id, user_id, product_id) constraint to cart_product table
+      author:  flauge
+      changes:
+        -  addPrimaryKey:
+             columnNames: cart_id, user_id, product_id
+             constraintName: pk_cart_product
+             tableName: cart_product
+
+  - changeSet:
+      id: 0.0.2-10
+      comment: Data load cart_user table
+      author: flauge
+      context: "!schema-only"
+      changes:
+        - sql:
+            sql: |-
+              INSERT INTO cart_user (username) VALUES ('aantonelli');
+              INSERT INTO cart_user (username) VALUES ('fcurti');
+              INSERT INTO cart_user (username) VALUES ('flauge');
+              INSERT INTO cart_user (username) VALUES ('ftalmon');
+              INSERT INTO cart_user (username) VALUES ('fpocatino');
+              INSERT INTO cart_user (username) VALUES ('lvenere');
+              INSERT INTO cart_user (username) VALUES ('mbillordo');
+              INSERT INTO cart_user (username) VALUES ('mrodon');
+              INSERT INTO cart_user (username) VALUES ('mfino');
+              INSERT INTO cart_user (username) VALUES ('psanabria');
+              INSERT INTO cart_user (username) VALUES ('slucarini');
+
+  - changeSet:
+      id: 0.0.2-11
+      comment: Data load product table
+      author: flauge
+      context: "!schema-only"
+      changes:
+        - sql:
+            sql: |-
+              INSERT INTO product (description, stock, price) VALUES ('Bakery Sweets', 1, 34.99); 
+              INSERT INTO product (description, stock, price) VALUES ('Cheesecake Party Wheel', 2, 59.99);
+              INSERT INTO product (description, stock, price) VALUES ('Confetti Cake', 3, 69.99);
+              INSERT INTO product (description, stock, price) VALUES ('Bakery Tray - Ultimate', 4, 159.99);
+              INSERT INTO product (description, stock, price) VALUES ('Signature Bakery Assortment', 5, 79.99);  
+              INSERT INTO product (description, stock, price) VALUES ('Classic Signature Cookie Gift Basket', 6, 44.99);
+              INSERT INTO product (description, stock, price) VALUES ('Signature New York-Style Cheesecake', 7, 39.99); 
+              INSERT INTO product (description, stock, price) VALUES ('Chocolate Birthday Cake', 8, 69.99); 
+              INSERT INTO product (description, stock, price) VALUES ('Classic Traditional Fruitcake', 9, 24.99);
+              INSERT INTO product (description, stock, price) VALUES ('Deluxe Signature Cookie Basket', 10, 79.99);
+              INSERT INTO product (description, stock, price) VALUES ('The Cheesecake Factory White Chocolate Raspberry Truffle Cheesecake - 10', 11, 99.99);
+              INSERT INTO product (description, stock, price) VALUES ('Chocolate Decadence Cake', 21, 24.99);
+              INSERT INTO product (description, stock, price) VALUES ('Signature Cinnamon Swirl', 31, 29.99);
+              INSERT INTO product (description, stock, price) VALUES ('Pick 24 Homemade Cookies', 41, 39.99);
+              INSERT INTO product (description, stock, price) VALUES ('Ultimate Carrot Cake', 51, 69.99);
+              INSERT INTO product (description, stock, price) VALUES ('Signature Tea Cakes Assortment', 61, 34.99);

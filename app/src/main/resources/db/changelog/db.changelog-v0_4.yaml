@@ -1,0 +1,53 @@
+databaseChangeLog:
+  - logicalFilePath: db.changelog-v0_4
+
+  -  changeSet:
+       id:  createFunction-fn_product_stock_self_update
+       author:  flauge
+       changes:
+         -  createFunction:
+              dbms:  postgresql
+              encoding:  UTF-8
+              functionBody: |-
+                DROP FUNCTION IF EXISTS fn_product_stock_self_update();
+                CREATE OR REPLACE FUNCTION fn_product_stock_self_update() 
+                RETURNS Trigger AS 
+                $$
+                BEGIN
+                  IF (TG_OP = ‘INSERT’) THEN
+                    UPDATE product p 
+                    SET p.stock = p.stock - NEW.quantity
+                    WHERE p.id = NEW.prod_id;
+
+                  ELSEIF (TG_OP = ‘DELETE’) THEN
+                    UPDATE product p 
+                    SET p.stock = p.stock + OLD.quantity
+                    WHERE p.id = OLD.prod_id;
+                    RETURN OLD;
+                  END IF;
+                
+                  END IF;
+                  RETURN NEW;
+                END
+                $$
+                LANGUAGE ‘plpgsql’;
+              functionName:  fn_product_stock_self_update
+              relativeToChangelogFile:  true
+              schemaName:  public
+
+  - changeSet:
+      id: createTrigger-tr_product_stock_self_update
+      author: flauge
+      changes:
+        - createTrigger:
+            comments: updates product stock when inserting or deleting purchase item
+            dbms: postgresql
+            encoding: UTF-8
+            triggerBody: |-
+              DROP TRIGGER IF EXISTS tr_product_stock_self_update;
+              CREATE TRIGGER tr_product_stock_self_update
+              AFTER INSERT OR DELETE ON purchase_item
+              FOR EACH ROW
+              EXECUTE PROCEDURE fn_product_stock_self_update();
+            triggerName: tr_product_stock_automatic_update
+            relativeToChangelogFile: true

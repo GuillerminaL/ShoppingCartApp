@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - include:
+      file: multivendor.yml
+      relativeToChangelogFile: true
+  - include:
+      file: db.changelog-v0_1.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: db.changelog-v0_2.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: db.changelog-v0_3.yaml
+      relativeToChangelogFile: true

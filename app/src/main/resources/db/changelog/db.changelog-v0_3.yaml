@@ -1,0 +1,116 @@
+databaseChangeLog:
+  - logicalFilePath: db.changelog-v0_3
+
+  - changeSet:
+      id: 0.0.3-1
+      comment: Create table purchase
+      author: flauge
+      changes:
+        - createTable:
+            tableName: purchase
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: PK_purchase
+                  name: id
+                  type: SERIAL
+              - column:
+                  constraints:
+                    nullable: false
+                  name: cart_id
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: VARCHAR
+              - column:
+                  constraints:
+                    nullable: false
+                  name: date
+                  type: datetime
+                  defaultValueDate: CURRENT_DATE
+              - column:
+                  constraints:
+                    nullable: false
+                  name: amount
+                  type: DOUBLE
+
+  - changeSet:
+      id: 0.0.3-2
+      comment: Create table purchase_item
+      author: flauge
+      changes:
+        - createTable:
+            tableName: purchase_item
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                  name: id
+                  type: SERIAL
+              - column:
+                  constraints:
+                    nullable: false
+                  name: purchase_id
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: prod_id
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: prod_description
+                  type: VARCHAR(80)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: prod_stock
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: prod_price
+                  type: DOUBLE
+              - column:
+                  constraints:
+                    nullable: false
+                  name: quantity
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: amount
+                  type: DOUBLE
+
+  - changeSet:
+     id:  0.0.3-3
+     comment: Add foreign key(purchase_id) constraint to purchase_item table
+     author:  flauge
+     changes:
+       -  addForeignKeyConstraint:
+            baseColumnNames:  purchase_id
+            baseTableName:  purchase_item
+            baseTableSchemaName:  public
+            constraintName:  fk_purchase_item
+            onDelete:  RESTRICT
+            onUpdate:  RESTRICT
+            referencedColumnNames:  id
+            referencedTableName:  purchase
+            referencedTableSchemaName:  public
+
+  - changeSet:
+      id:  0.0.3-4
+      comment: Add primary key(id, purchase_id) constraint to purchase_item table
+      author:  flauge
+      changes:
+        -  addPrimaryKey:
+             columnNames: id, purchase_id
+             constraintName: pk_purchase_item
+             tableName: purchase_item
