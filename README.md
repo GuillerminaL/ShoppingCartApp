@@ -1,20 +1,24 @@
-### Shopping Cart Application 
+# Shopping Cart Application 
+----------------------------------------------------------------------------
 
-# Description
-The app allows a user to have multiple carts and reuse them once the cart order has been processed and purchased.
-
-Since each purchase generates a register, it also allows to keep track of them, making easy to keep track of remaining stock of products after each purchase and elaborate informs such as regular purchases in general or for particular users, etc. 
+## Description
+*Java Spring Boot API REST*
+Special features: 
+	- The present shopping cart application allows a user to have *multiple carts* and reuse them once the cart order has been processed and purchased.
+ 	- Since each purchase generates a register, it also allows to keep track of them, making easy to keep track of remaining stock of products after each purchase and elaborate informs such as regular purchases in general or for particular users, etc. 
 
 ## Demo
 
 ![shoppingcart_api_demo.gif](shoppingcart_api_demo.gif)
 
-# ERD
+----------------------------------------------------------------------------
+
+### ERD
 
 ![ERD_shoppingcart_app.svg](ERD_shoppingcart_app.svg)
 
 
-# ENDPOINTS
+## ENDPOINTS
 
 ## POST User Cart
 
